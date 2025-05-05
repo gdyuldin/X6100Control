@@ -92,21 +92,24 @@ static bool get_regs(uint16_t reg, void *buf, uint8_t cnt) {
         return false;
     }
     reg = (reg & 0xFF) << 8 | (reg >> 8);
-    if (!send_regs(&reg, 2)) {
-        return false;
-    }
     struct i2c_msg messages[] = {
+        {
+            .addr  = i2c_addr,
+            .flags = 0,
+            .len = 2,
+            .buf = (char*)&reg,
+        },
         {
             .addr  = i2c_addr,
             .flags = I2C_M_RD,
             .len   = cnt,
             .buf   = buf,
-        },
+        }
     };
 
     struct i2c_rdwr_ioctl_data packets = {
         .msgs      = messages,
-        .nmsgs     = 1,
+        .nmsgs     = 2,
     };
 
     if(ioctl(i2c_fd, I2C_RDWR, &packets) < 0) {
