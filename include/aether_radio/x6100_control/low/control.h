@@ -35,7 +35,8 @@ typedef enum
     x6100_rxvol,
     x6100_rfg_txpwr,
 
-    x6100_atu_network = 17,
+    x6100_reg_16 = 16,  // last 2 bytes - 2 parameters?
+    x6100_atu_network = 17,  // last 2 bytes and bool value
 
     x6100_ling_loutg_imicg_hmicg = 20,
     x6100_micsel_pttmode_chge_spmode_auxiqgen_sqlthr,
@@ -59,10 +60,10 @@ typedef enum
     x6100_filter2_low,
     x6100_filter2_high,
 
-    x6100_rphscmp = 48, // RX PHS COMP
-    x6100_rmagcmp, // RX MAG COMP
-    x6100_txiofs, // TXI DC OFFSET
-    x6100_txqofs, // TXQ DC OFFSET
+    x6100_rphscmp = 48, // RX PHS COMP, multiplied by 0.001 on BASE, looks like not used
+    x6100_rmagcmp, // RX MAG COMP, multiplied by 0.0001 on BASE, looks like not used
+    x6100_txiofs, // TXI DC OFFSET, multiplied by 5000 on BASE
+    x6100_txqofs, // TXQ DC OFFSET, multiplied by 5000 on BASE
 
     x6100_pwrsync = 53,
     x6100_last = 55
@@ -151,3 +152,4 @@ AETHER_X6100CTRL_API void x6100_control_idle();
 AETHER_X6100CTRL_API bool x6100_control_set_band(uint32_t freq);
 AETHER_X6100CTRL_API uint32_t x6100_control_get(x6100_cmd_enum_t cmd);
 AETHER_X6100CTRL_API char* x6100_control_get_fw_version();
+AETHER_X6100CTRL_API uint8_t x6100_control_get_patched_revision();

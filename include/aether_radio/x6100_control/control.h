@@ -31,6 +31,7 @@ AETHER_X6100CTRL_API void x6100_control_vfo_pre_set(x6100_vfo_t vfo, x6100_pre_t
 
 AETHER_X6100CTRL_API void x6100_control_rfg_set(uint8_t rfg);       /* RF gain 0 - 100 */
 AETHER_X6100CTRL_API void x6100_control_txpwr_set(float pwr);       /* TX power 0 - 10.0 */
+AETHER_X6100CTRL_API void x6100_control_output_gain_set(float gain_db);  /* Output gain offset: -25 - 25 dB */
 AETHER_X6100CTRL_API void x6100_control_sql_set(uint8_t sql);       /* Voice SQL 0 - 100 */
 
 /* Sound settings */
@@ -52,6 +53,8 @@ AETHER_X6100CTRL_API void x6100_control_calibration_set(bool on);   /* Toggle ca
 AETHER_X6100CTRL_API void x6100_control_charger_set(bool on);       /* Toggle charger */
 AETHER_X6100CTRL_API void x6100_control_bias_drive_set(uint16_t x);
 AETHER_X6100CTRL_API void x6100_control_bias_final_set(uint16_t x);
+AETHER_X6100CTRL_API void x6100_control_tx_i_offset_set(int32_t offset);
+AETHER_X6100CTRL_API void x6100_control_tx_q_offset_set(int32_t offset);
 
 /* Keyer settings */
 
@@ -81,6 +84,7 @@ AETHER_X6100CTRL_API void x6100_control_mic_set(x6100_mic_sel_t mic);   /* MIC s
 AETHER_X6100CTRL_API void x6100_control_dnf_set(bool on);               /* Notch filter */
 AETHER_X6100CTRL_API void x6100_control_dnf_center_set(uint16_t freq);
 AETHER_X6100CTRL_API void x6100_control_dnf_width_set(uint16_t hz);
+AETHER_X6100CTRL_API void x6100_control_dnf_update_set(bool on);
 
 AETHER_X6100CTRL_API void x6100_control_nb_set(bool on);                /* Noise blanker */
 AETHER_X6100CTRL_API void x6100_control_nb_level_set(uint8_t level);
@@ -113,3 +117,6 @@ AETHER_X6100CTRL_API void x6100_control_xit_set(int16_t val);
 
 AETHER_X6100CTRL_API void x6100_control_comp_set(bool on);
 AETHER_X6100CTRL_API void x6100_control_comp_level_set(x6100_comp_level_t level);
+
+AETHER_X6100CTRL_API void x6100_control_comp_threshold_set(float threshold_offset);
+AETHER_X6100CTRL_API void x6100_control_comp_makeup_set(float threshold_offset);

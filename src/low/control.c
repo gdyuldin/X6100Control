@@ -19,8 +19,6 @@
 #include <sys/ioctl.h>
 #include <sys/time.h>
 
-#define REFRASH_TIMEOUT (1 * 1000)
-
 typedef struct __attribute__((__packed__))
 {
     uint16_t addr;
@@ -37,6 +35,9 @@ static int i2c_fd = -1;
 static int i2c_addr = 0x72;
 static all_cmd_struct_t all_cmd;
 static uint8_t cur_band = 0;
+
+// Patched base FW revision. 0 if OEM
+static uint8_t patched_revision;
 
 static bool i2c_open()
 {
@@ -119,11 +120,27 @@ static bool get_regs(uint16_t reg, void *buf, uint8_t cnt) {
     return true;
 }
 
+static void extract_patched_revision(char * version) {
+    if (!version) {
+        return;
+    }
+    char *revision = strstr(version, ",r");
+    if (!revision) {
+        return;
+    }
+    patched_revision = atoi(revision + 2);
+    printf("Detected patched BASE revision: %d\n", patched_revision);
+}
+
 bool x6100_control_init()
 {
     if(!i2c_open()) {
         return false;
     }
+
+    char *base_version = x6100_control_get_fw_version();
+    printf("BASE version: %s\n", base_version);
+    extract_patched_revision(base_version);
 
     memset(&all_cmd, 0, sizeof(all_cmd));
 
@@ -255,4 +272,9 @@ bool x6100_control_set_band(uint32_t freq)
         return true;
     }
     return false;
+}
+
+
+uint8_t x6100_control_get_patched_revision() {
+    return patched_revision;
 }

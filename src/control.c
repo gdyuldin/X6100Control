@@ -202,10 +202,22 @@ void x6100_control_rfg_set(uint8_t rfg) {
 }
 
 void x6100_control_txpwr_set(float pwr) {
-    uint32_t prev = x6100_control_get(x6100_rfg_txpwr) & (0xFF);
+    uint32_t prev = x6100_control_get(x6100_rfg_txpwr) & (~(0xFF << 8));
     uint8_t  p = pwr * 10.0f;
 
     x6100_control_cmd(x6100_rfg_txpwr, prev | (p << 8));
+}
+
+void x6100_control_output_gain_set(float gain_db) {
+    if (gain_db > 25.0f) {
+        gain_db = 25.0f;
+    } else if (gain_db < -25.0f) {
+        gain_db = -25.0f;
+    }
+    uint32_t prev = x6100_control_get(x6100_rfg_txpwr) & (~(0xFF << 16));
+    int8_t p = gain_db * 5.0f;
+
+    x6100_control_cmd(x6100_rfg_txpwr, prev | ((uint8_t)p << 16));
 }
 
 void x6100_control_charger_set(bool on) {
@@ -215,15 +227,23 @@ void x6100_control_charger_set(bool on) {
 }
 
 void x6100_control_bias_drive_set(uint16_t x) {
-    uint32_t prev = x6100_control_get(x6100_biasdrive_biasfinal) & (0xFFFF);
+    uint32_t prev = x6100_control_get(x6100_biasdrive_biasfinal) & ~(0xFFFF);
 
     x6100_control_cmd(x6100_biasdrive_biasfinal, prev | x);
 }
 
 void x6100_control_bias_final_set(uint16_t x) {
-    uint32_t prev = x6100_control_get(x6100_biasdrive_biasfinal) & ((uint32_t) 0xFFFF << 16);
+    uint32_t prev = x6100_control_get(x6100_biasdrive_biasfinal) & ~(0xFFFF << 16);
 
     x6100_control_cmd(x6100_biasdrive_biasfinal, prev | (x << 16));
+}
+
+void x6100_control_tx_i_offset_set(int32_t offset) {
+    x6100_control_cmd(x6100_txiofs, offset);
+}
+
+void x6100_control_tx_q_offset_set(int32_t offset) {
+    x6100_control_cmd(x6100_txqofs, offset);
 }
 
 void x6100_control_sql_set(uint8_t sql) {
@@ -296,9 +316,9 @@ void x6100_control_lineout_set(uint8_t gain) {
 }
 
 void x6100_control_iqout_set(bool on) {
-    uint32_t prev = x6100_control_get(x6100_micsel_pttmode_chge_spmode_auxiqgen_sqlthr) & (~(1 << 8));
+    uint32_t prev = x6100_control_get(x6100_micsel_pttmode_chge_spmode_auxiqgen_sqlthr) & (~(1 << 6));
 
-    x6100_control_cmd(x6100_micsel_pttmode_chge_spmode_auxiqgen_sqlthr, prev | (on << 8));
+    x6100_control_cmd(x6100_micsel_pttmode_chge_spmode_auxiqgen_sqlthr, prev | (on << 6));
 }
 
 void x6100_control_imic_set(uint8_t gain) {
@@ -347,6 +367,12 @@ void x6100_control_dnf_width_set(uint16_t hz) {
     x6100_control_cmd(x6100_dnfcnt_dnfwidth_dnfe, prev | ((hz & 0xFFF) << 12));
 }
 
+void x6100_control_dnf_update_set(bool on) {
+    uint32_t prev = x6100_control_get(x6100_dnfcnt_dnfwidth_dnfe) & (~(1 << 25));
+
+    x6100_control_cmd(x6100_dnfcnt_dnfwidth_dnfe, prev | (on << 25));
+}
+
 void x6100_control_nb_set(bool on) {
     uint32_t prev = x6100_control_get(x6100_nrthr_nbw_nbthr_nre_nbe) & (~(1 << 25));
 
@@ -392,7 +418,7 @@ void x6100_control_agc_knee_set(int8_t db) {
 }
 
 void x6100_control_agc_slope_set(uint8_t db) {
-    uint32_t prev = x6100_control_get(x6100_agcknee_agcslope_agchang) & (~(0xF << 8));
+    uint32_t prev = x6100_control_get(x6100_agcknee_agcslope_agchang) & (~(0xFF << 8));
 
     x6100_control_cmd(x6100_agcknee_agcslope_agchang, prev | (db << 8));
 }
@@ -427,7 +453,13 @@ void x6100_control_vox_gain_set(uint8_t level) {
     x6100_control_cmd(x6100_voxg_voxag_voxdly_voxe, prev | (level & 0x7F));
 }
 
-/* COMP */
+/* COMP
+0 - 3 - level
+4 - on/off
+10 - 5 - threshold, 0.5 db, -15.5 ... +16
+16 - 11 - makeup, 0.5 db, -15.5 ... +16
+*/
+
 
 void x6100_control_comp_set(bool on)
 {
@@ -440,4 +472,30 @@ void x6100_control_comp_level_set(x6100_comp_level_t level)
 {
     uint32_t prev = x6100_control_get(x6100_cmplevel_cmpe) & (~0xf);
     x6100_control_cmd(x6100_cmplevel_cmpe, prev | (level & 0xf));
+}
+
+void x6100_control_comp_threshold_set(float threshold_offset)
+{
+    // Step = 0.5 db, range -15.5...16
+    if (threshold_offset > 16.0f) {
+        threshold_offset = 16.0f;
+    } else if (threshold_offset < -15.5f) {
+        threshold_offset = -15.5f;
+    }
+    int8_t threshold = threshold_offset * 2;
+    uint32_t prev = x6100_control_get(x6100_cmplevel_cmpe) & (~(0x3F << 5));
+    x6100_control_cmd(x6100_cmplevel_cmpe, prev | (((uint8_t)threshold & 0x3F) << 5));
+}
+
+void x6100_control_comp_makeup_set(float makeup)
+{
+    // Step = 0.5 db, range -15.5...16
+    if (makeup > 16.0f) {
+        makeup = 16.0f;
+    } else if (makeup < -15.5f) {
+        makeup = -15.5f;
+    }
+    int8_t makeup_int = makeup * 2;
+    uint32_t prev = x6100_control_get(x6100_cmplevel_cmpe) & (~(0x3F << 11));
+    x6100_control_cmd(x6100_cmplevel_cmpe, prev | (((uint8_t)makeup_int & 0x3F) << 11));
 }
