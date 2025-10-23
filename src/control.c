@@ -15,6 +15,11 @@ static x6100_vfo_t fg_vfo;
 
 /* VFO Settings */
 
+
+void x6100_control_vfo_ham_band_set(x6100_vfo_t vfo, bool is_ham_band) {
+    x6100_control_cmd(vfo == X6100_VFO_A ? x6100_vfoa_ham_band : x6100_vfob_ham_band, is_ham_band);
+}
+
 void x6100_control_vfo_mode_set(x6100_vfo_t vfo, x6100_mode_t mode)
 {
     x6100_control_cmd(vfo == X6100_VFO_A ? x6100_vfoa_mode : x6100_vfob_mode, mode);

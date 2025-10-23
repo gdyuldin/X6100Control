@@ -32,11 +32,15 @@ typedef enum
 
     x6100_sple_atue_trx = 12,
     x6100_vi_vm,
-    x6100_rxvol,
+    x6100_rxvol,  // free 3 bytes
     x6100_rfg_txpwr,
 
     x6100_reg_16 = 16,  // last 2 bytes - 2 parameters?
     x6100_atu_network = 17,  // last 2 bytes and bool value
+
+    x6100_custom = 18,
+
+    // gap - 2 registers
 
     x6100_ling_loutg_imicg_hmicg = 20,
     x6100_micsel_pttmode_chge_spmode_auxiqgen_sqlthr,
@@ -153,3 +157,6 @@ AETHER_X6100CTRL_API bool x6100_control_set_band(uint32_t freq);
 AETHER_X6100CTRL_API uint32_t x6100_control_get(x6100_cmd_enum_t cmd);
 AETHER_X6100CTRL_API char* x6100_control_get_fw_version();
 AETHER_X6100CTRL_API uint8_t x6100_control_get_patched_revision();
+
+AETHER_X6100CTRL_NO_EXPORT void i2c_lock();
+AETHER_X6100CTRL_NO_EXPORT void i2c_unlock();

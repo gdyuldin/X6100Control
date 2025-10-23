@@ -18,6 +18,7 @@
 #include <unistd.h>
 #include <sys/ioctl.h>
 #include <sys/time.h>
+#include <pthread.h>
 
 typedef struct __attribute__((__packed__))
 {
@@ -35,6 +36,7 @@ static int i2c_fd = -1;
 static int i2c_addr = 0x72;
 static all_cmd_struct_t all_cmd;
 static uint8_t cur_band = 0;
+static pthread_mutex_t i2c_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 // Patched base FW revision. 0 if OEM
 static uint8_t patched_revision;
@@ -79,11 +81,13 @@ static bool send_regs(void *regs, size_t size)
         .msgs = messages,
         .nmsgs = 1,
     };
-
+    pthread_mutex_lock(&i2c_mutex);
     if(ioctl(i2c_fd, I2C_RDWR, &packets) < 0) {
         perror("Can't write to i2c");
+        pthread_mutex_unlock(&i2c_mutex);
         return false;
     }
+    pthread_mutex_unlock(&i2c_mutex);
     return true;
 }
 
@@ -112,11 +116,13 @@ static bool get_regs(uint16_t reg, void *buf, uint8_t cnt) {
         .msgs      = messages,
         .nmsgs     = 2,
     };
-
+    pthread_mutex_lock(&i2c_mutex);
     if(ioctl(i2c_fd, I2C_RDWR, &packets) < 0) {
         perror("Can't read from i2c");
+        pthread_mutex_unlock(&i2c_mutex);
         return false;
     }
+    pthread_mutex_unlock(&i2c_mutex);
     return true;
 }
 
@@ -207,6 +213,14 @@ void x6100_control_idle()
         i2c_open();
         send_regs(&all_cmd, sizeof(all_cmd));
     }
+}
+
+void i2c_lock() {
+    pthread_mutex_lock(&i2c_mutex);
+}
+
+void i2c_unlock() {
+    pthread_mutex_unlock(&i2c_mutex);
 }
 
 static uint8_t band_index(int freq)

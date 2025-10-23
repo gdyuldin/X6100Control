@@ -21,6 +21,10 @@ typedef enum {
 
 AETHER_X6100CTRL_API void x6100_control_vfo_set(x6100_vfo_t vfo);
 
+/**
+ * Enable/disable TX
+ */
+AETHER_X6100CTRL_API void x6100_control_vfo_ham_band_set(x6100_vfo_t vfo, bool is_ham_band);
 AETHER_X6100CTRL_API void x6100_control_vfo_mode_set(x6100_vfo_t vfo, x6100_mode_t mode);
 AETHER_X6100CTRL_API void x6100_control_vfo_agc_set(x6100_vfo_t vfo, x6100_agc_t agc);
 AETHER_X6100CTRL_API void x6100_control_vfo_freq_set(x6100_vfo_t vfo, uint32_t freq);
