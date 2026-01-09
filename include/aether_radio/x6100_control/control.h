@@ -35,8 +35,11 @@ AETHER_X6100CTRL_API void x6100_control_vfo_pre_set(x6100_vfo_t vfo, x6100_pre_t
 
 AETHER_X6100CTRL_API void x6100_control_rfg_set(uint8_t rfg);       /* RF gain 0 - 100 */
 AETHER_X6100CTRL_API void x6100_control_txpwr_set(float pwr);       /* TX power 0 - 10.0 */
+AETHER_X6100CTRL_API void x6100_control_fftdec_set(uint8_t val);
 AETHER_X6100CTRL_API void x6100_control_output_gain_set(float gain_db);  /* Output gain offset: -25 - 25 dB */
 AETHER_X6100CTRL_API void x6100_control_sql_set(uint8_t sql);       /* Voice SQL 0 - 100 */
+AETHER_X6100CTRL_API void x6100_control_if_shift_set(bool on);
+AETHER_X6100CTRL_API void x6100_control_if_shift_freq_set(int32_t freq);
 
 /* Sound settings */
 
@@ -103,6 +106,10 @@ AETHER_X6100CTRL_API void x6100_control_agc_hang_set(bool on);
 AETHER_X6100CTRL_API void x6100_control_agc_knee_set(int8_t db);
 AETHER_X6100CTRL_API void x6100_control_agc_slope_set(uint8_t db);
 AETHER_X6100CTRL_API void x6100_control_agc_time_set(uint16_t ms);
+// 1.1.9 base
+AETHER_X6100CTRL_API void x6100_control_agc_time_slow_set(uint16_t ms);
+AETHER_X6100CTRL_API void x6100_control_agc_time_mid_set(uint16_t ms);
+AETHER_X6100CTRL_API void x6100_control_agc_time_fast_set(uint16_t ms);
 
 /* VOX */
 

@@ -38,8 +38,8 @@ static all_cmd_struct_t all_cmd;
 static uint8_t cur_band = 0;
 static pthread_mutex_t i2c_mutex = PTHREAD_MUTEX_INITIALIZER;
 
-// Patched base FW revision. 0 if OEM
-static uint8_t patched_revision;
+// x6100 BASE version struct
+static x6100_base_ver_t base_ver;
 
 static bool i2c_open()
 {
@@ -126,16 +126,60 @@ static bool get_regs(uint16_t reg, void *buf, uint8_t cnt) {
     return true;
 }
 
-static void extract_patched_revision(char * version) {
+static bool extract_version_info(const char *version, x6100_base_ver_t *semver) {
     if (!version) {
-        return;
+        printf("Version is empty\n");
+        return false;
     }
-    char *revision = strstr(version, ",r");
-    if (!revision) {
-        return;
+    char *a, *b;
+    char ver[80];
+    strncpy(ver, version, sizeof(ver));
+    a = strstr(ver, "V");
+    if (!a) {
+        printf("V is not found\n");
+        return false;
     }
-    patched_revision = atoi(revision + 2);
-    printf("Detected patched BASE revision: %d\n", patched_revision);
+    // Extract major
+    a++;
+    b = strstr(a, ".");
+    if (!b) {
+        printf(". after major is not found\n");
+        return false;
+    }
+    *b = '\0';
+    semver->parsed.major = atoi(a);
+
+    // Extract minor
+    a = b + 1;
+    b = strstr(a, ".");
+    if (!b) {
+        printf(". after minor is not found\n");
+        return false;
+    }
+    *b = '\0';
+    semver->parsed.minor = atoi(a);
+
+    // Extract patch
+    a = b + 1;
+    b = strstr(a, " ");
+    if (!b) {
+        printf("Space after patch is not found\n");
+        return false;
+    }
+    *b = '\0';
+    semver->parsed.patch = atoi(a);
+
+    // extract R2RFE revision
+    a = b + 1;
+    b = strstr(a, ",r");
+    if (!b) {
+        printf("Base is not patched\n");
+        semver->parsed.rev = 0;
+        return true;
+    }
+    semver->parsed.rev = atoi(b + 2);
+    printf("Detected patched BASE revision: %d\n", semver->parsed.rev);
+    return true;
 }
 
 bool x6100_control_init()
@@ -144,9 +188,9 @@ bool x6100_control_init()
         return false;
     }
 
-    char *base_version = x6100_control_get_fw_version();
+    char *base_version = x6100_control_get_fw_version_str();
     printf("BASE version: %s\n", base_version);
-    extract_patched_revision(base_version);
+    extract_version_info(base_version, &base_ver);
 
     memset(&all_cmd, 0, sizeof(all_cmd));
 
@@ -196,7 +240,7 @@ uint32_t x6100_control_get(x6100_cmd_enum_t cmd)
     return all_cmd.arg[cmd];
 }
 
-char *x6100_control_get_fw_version()
+char *x6100_control_get_fw_version_str()
 {
     static char version[0x80] = "\0";
     if (get_regs(0, version, 0x80))
@@ -204,6 +248,8 @@ char *x6100_control_get_fw_version()
     else
         return NULL;
 }
+
+
 
 void x6100_control_idle()
 {
@@ -289,6 +335,6 @@ bool x6100_control_set_band(uint32_t freq)
 }
 
 
-uint8_t x6100_control_get_patched_revision() {
-    return patched_revision;
+x6100_base_ver_t x6100_control_get_base_ver() {
+    return base_ver;
 }

@@ -33,7 +33,7 @@ typedef enum
     x6100_sple_atue_trx = 12,
     x6100_vi_vm,
     x6100_rxvol,  // free 3 bytes
-    x6100_rfg_txpwr,
+    x6100_rfg_txpwr, // plus fft_span
 
     x6100_reg_16 = 16,  // last 2 bytes - 2 parameters?
     x6100_atu_network = 17,  // last 2 bytes and bool value
@@ -55,6 +55,7 @@ typedef enum
 
     x6100_ks_km_kimb_cwtone_cwvol_cwtrain = 33,
     x6100_qsktime_kr,
+    x6100_if_shift,  // on/off and shift
 
     x6100_biasdrive_biasfinal = 41,
     x6100_rit,
@@ -148,6 +149,17 @@ typedef enum {
     x6100_comp_1_8
 } x6100_comp_level_t;
 
+
+typedef union {
+    struct {
+        uint8_t major;
+        uint8_t minor;
+        uint8_t patch;
+        uint8_t rev;
+    } parsed;
+    uint32_t raw;
+} x6100_base_ver_t;
+
 /* Functions */
 
 AETHER_X6100CTRL_API bool x6100_control_init();
@@ -155,8 +167,8 @@ AETHER_X6100CTRL_API bool x6100_control_cmd(x6100_cmd_enum_t cmd, uint32_t arg);
 AETHER_X6100CTRL_API void x6100_control_idle();
 AETHER_X6100CTRL_API bool x6100_control_set_band(uint32_t freq);
 AETHER_X6100CTRL_API uint32_t x6100_control_get(x6100_cmd_enum_t cmd);
-AETHER_X6100CTRL_API char* x6100_control_get_fw_version();
-AETHER_X6100CTRL_API uint8_t x6100_control_get_patched_revision();
+AETHER_X6100CTRL_API char* x6100_control_get_fw_version_str();
+AETHER_X6100CTRL_API x6100_base_ver_t x6100_control_get_base_ver();
 
 AETHER_X6100CTRL_NO_EXPORT void i2c_lock();
 AETHER_X6100CTRL_NO_EXPORT void i2c_unlock();

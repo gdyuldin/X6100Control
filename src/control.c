@@ -213,6 +213,12 @@ void x6100_control_txpwr_set(float pwr) {
     x6100_control_cmd(x6100_rfg_txpwr, prev | (p << 8));
 }
 
+void x6100_control_fftdec_set(uint8_t val) {
+    // val range: 0 ... 4 (1 ... 16 decimation)
+    uint32_t prev = x6100_control_get(x6100_rfg_txpwr) & (~(0xF << 16));
+    x6100_control_cmd(x6100_rfg_txpwr, prev | ((val & 0xf) << 16));
+}
+
 void x6100_control_output_gain_set(float gain_db) {
     if (gain_db > 25.0f) {
         gain_db = 25.0f;
@@ -256,6 +262,20 @@ void x6100_control_sql_set(uint8_t sql) {
 
     x6100_control_cmd(x6100_micsel_pttmode_chge_spmode_auxiqgen_sqlthr, prev | (sql << 8));
 }
+
+void x6100_control_if_shift_set(bool on) {
+    // Inverse of center_mode. Default is off
+    uint32_t prev = x6100_control_get(x6100_if_shift) & (~(0xFF << 24));
+
+    x6100_control_cmd(x6100_if_shift, prev | (!on << 24));
+}
+
+void x6100_control_if_shift_freq_set(int32_t freq) {
+    uint32_t prev = x6100_control_get(x6100_if_shift) & ~(0xFFFFFF);
+
+    x6100_control_cmd(x6100_if_shift, prev | (freq & 0xFFFFFF));
+}
+
 
 /* Keyer settings */
 
@@ -430,6 +450,24 @@ void x6100_control_agc_slope_set(uint8_t db) {
 
 void x6100_control_agc_time_set(uint16_t ms) {
     x6100_control_cmd(x6100_agctime, ms);
+}
+
+void x6100_control_agc_time_slow_set(uint16_t ms) {
+    uint32_t prev = x6100_control_get(x6100_agctime) & (~(0x3FF));
+
+    x6100_control_cmd(x6100_agctime, prev | (ms & 0x3FF));
+}
+
+void x6100_control_agc_time_mid_set(uint16_t ms) {
+    uint32_t prev = x6100_control_get(x6100_agctime) & (~(0x3ff << 10));
+
+    x6100_control_cmd(x6100_agctime, prev | ((ms & 0x3ff) << 10));
+}
+
+void x6100_control_agc_time_fast_set(uint16_t ms) {
+    uint32_t prev = x6100_control_get(x6100_agctime) & (~(0x3ff << 0x14));
+
+    x6100_control_cmd(x6100_agctime, prev | ((ms & 0x3ff) << 0x14));
 }
 
 /* VOX */
