@@ -147,7 +147,7 @@ static bool extract_version_info(const char *version, x6100_base_ver_t *semver) 
         return false;
     }
     *b = '\0';
-    semver->parsed.major = atoi(a);
+    semver->major = atoi(a);
 
     // Extract minor
     a = b + 1;
@@ -157,7 +157,7 @@ static bool extract_version_info(const char *version, x6100_base_ver_t *semver) 
         return false;
     }
     *b = '\0';
-    semver->parsed.minor = atoi(a);
+    semver->minor = atoi(a);
 
     // Extract patch
     a = b + 1;
@@ -167,18 +167,18 @@ static bool extract_version_info(const char *version, x6100_base_ver_t *semver) 
         return false;
     }
     *b = '\0';
-    semver->parsed.patch = atoi(a);
+    semver->patch = atoi(a);
 
     // extract R2RFE revision
     a = b + 1;
     b = strstr(a, ",r");
     if (!b) {
         printf("Base is not patched\n");
-        semver->parsed.rev = 0;
+        semver->rev = 0;
         return true;
     }
-    semver->parsed.rev = atoi(b + 2);
-    printf("Detected patched BASE revision: %d\n", semver->parsed.rev);
+    semver->rev = atoi(b + 2);
+    printf("Detected patched BASE revision: %d\n", semver->rev);
     return true;
 }
 

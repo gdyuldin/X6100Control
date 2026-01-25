@@ -214,21 +214,41 @@ void x6100_control_txpwr_set(float pwr) {
 }
 
 void x6100_control_fftdec_set(uint8_t val) {
-    // val range: 0 ... 4 (1 ... 16 decimation)
+    // val range: 0 ... 3 (1 ... 8 decimation)
     uint32_t prev = x6100_control_get(x6100_rfg_txpwr) & (~(0xF << 16));
-    x6100_control_cmd(x6100_rfg_txpwr, prev | ((val & 0xf) << 16));
+    x6100_control_cmd(x6100_rfg_txpwr, prev | ((val & 0xF) << 16));
 }
 
-void x6100_control_output_gain_set(float gain_db) {
-    if (gain_db > 25.0f) {
-        gain_db = 25.0f;
-    } else if (gain_db < -25.0f) {
-        gain_db = -25.0f;
-    }
-    uint32_t prev = x6100_control_get(x6100_rfg_txpwr) & (~(0xFF << 16));
-    int8_t p = gain_db * 5.0f;
+void x6100_control_adc_dac_gain_set(float gain_db) {
+    union {
+        float f;
+        uint32_t i;
+    } val = {gain_db};
+    x6100_reg_dac_adc_offsets_t reg = {x6100_control_get(x6100_dac_adc_offsets)};
+    reg.v.adc_dac_gain_offset = val.i >> 16;
+    x6100_control_cmd(x6100_dac_adc_offsets, reg.i);
+}
 
-    x6100_control_cmd(x6100_rfg_txpwr, prev | ((uint8_t)p << 16));
+void x6100_control_dac_gain_set(float gain_db) {
+    union {
+        float f;
+        uint32_t i;
+    } val = {gain_db};
+    x6100_reg_dac_adc_offsets_t reg = {x6100_control_get(x6100_dac_adc_offsets)};
+    reg.v.dac_gain_offset = val.i >> 16;
+    x6100_control_cmd(x6100_dac_adc_offsets, reg.i);
+}
+
+void x6100_control_bf16_flow_set(bool on) {
+    x6100_reg_flow_fm_emp_flags_t reg = {x6100_control_get(x6100_flow_fm_emp)};
+    reg.v.flow_fp16 = on;
+    x6100_control_cmd(x6100_flow_fm_emp, reg.i);
+}
+
+void x6100_control_fm_emp(bool on) {
+    x6100_reg_flow_fm_emp_flags_t reg = {x6100_control_get(x6100_flow_fm_emp)};
+    reg.v.fm_emp = on;
+    x6100_control_cmd(x6100_flow_fm_emp, reg.i);
 }
 
 void x6100_control_charger_set(bool on) {

@@ -38,7 +38,8 @@ typedef enum
     x6100_reg_16 = 16,  // last 2 bytes - 2 parameters?
     x6100_atu_network = 17,  // last 2 bytes and bool value
 
-    x6100_custom = 18,
+    x6100_flow_fm_emp = 18,
+    x6100_dac_adc_offsets = 19,
 
     // gap - 2 registers
 
@@ -150,15 +151,28 @@ typedef enum {
 } x6100_comp_level_t;
 
 
-typedef union {
-    struct {
-        uint8_t major;
-        uint8_t minor;
-        uint8_t patch;
-        uint8_t rev;
-    } parsed;
-    uint32_t raw;
+typedef struct {
+    uint8_t major;
+    uint8_t minor;
+    uint8_t patch;
+    uint8_t rev;
 } x6100_base_ver_t;
+
+typedef union {
+    uint32_t i;
+    struct {
+        uint8_t flow_fp16: 1;
+        uint8_t fm_emp: 1;
+    } v;
+} x6100_reg_flow_fm_emp_flags_t;
+
+typedef union {
+    uint32_t i;
+    struct {
+        uint16_t adc_dac_gain_offset;  // bf16
+        uint16_t dac_gain_offset;  // bf16
+    } v;
+} x6100_reg_dac_adc_offsets_t;
 
 /* Functions */
 
