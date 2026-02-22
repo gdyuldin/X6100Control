@@ -451,21 +451,21 @@ void x6100_control_nr_level_set(uint8_t level) {
 /* AGC */
 
 void x6100_control_agc_hang_set(bool on) {
-    uint32_t prev = x6100_control_get(x6100_agcknee_agcslope_agchang) & (~(1 << 12));
-
-    x6100_control_cmd(x6100_agcknee_agcslope_agchang, prev | (on << 12));
+    x6100_agcknee_agcslope_agchang_t prev = {x6100_control_get(x6100_agcknee_agcslope_agchang)};
+    prev.v.on = on;
+    x6100_control_cmd(x6100_agcknee_agcslope_agchang, prev.i);
 }
 
 void x6100_control_agc_knee_set(int8_t db) {
-    uint32_t prev = x6100_control_get(x6100_agcknee_agcslope_agchang) & (~0xFF);
-
-    x6100_control_cmd(x6100_agcknee_agcslope_agchang, prev | (db & 0xFF));
+    x6100_agcknee_agcslope_agchang_t prev = {x6100_control_get(x6100_agcknee_agcslope_agchang)};
+    prev.v.knee = db;
+    x6100_control_cmd(x6100_agcknee_agcslope_agchang, prev.i);
 }
 
 void x6100_control_agc_slope_set(uint8_t db) {
-    uint32_t prev = x6100_control_get(x6100_agcknee_agcslope_agchang) & (~(0xFF << 8));
-
-    x6100_control_cmd(x6100_agcknee_agcslope_agchang, prev | (db << 8));
+    x6100_agcknee_agcslope_agchang_t prev = {x6100_control_get(x6100_agcknee_agcslope_agchang)};
+    prev.v.slope = db;
+    x6100_control_cmd(x6100_agcknee_agcslope_agchang, prev.i);
 }
 
 void x6100_control_agc_time_set(uint16_t ms) {

@@ -174,6 +174,15 @@ typedef union {
     } v;
 } x6100_reg_dac_adc_offsets_t;
 
+typedef union {
+    uint32_t i;
+    struct {
+        int8_t knee;
+        uint8_t slope: 4;
+        bool on: 1;
+    } v;
+} x6100_agcknee_agcslope_agchang_t;
+
 /* Functions */
 
 AETHER_X6100CTRL_API bool x6100_control_init();
