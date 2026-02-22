@@ -49,6 +49,7 @@ AETHER_X6100CTRL_API void x6100_control_if_shift_freq_set(int32_t freq);
 AETHER_X6100CTRL_API void x6100_control_rxvol_set(uint8_t vol);     /* Speaker volume */
 AETHER_X6100CTRL_API void x6100_control_record_set(bool on);        /* Toggle audio stream mic/speaker or RX/TX audio */
 AETHER_X6100CTRL_API void x6100_control_spmode_set(bool phone);     /* Toggle Speaker/Phone audio out */
+AETHER_X6100CTRL_API void x6100_control_moni_set(uint16_t level);   /* Toggle Speaker/Phone audio out */
 
 /* Operation */
 

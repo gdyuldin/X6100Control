@@ -89,6 +89,11 @@ void x6100_control_spmode_set(bool phone)
     x6100_control_cmd(x6100_micsel_pttmode_chge_spmode_auxiqgen_sqlthr, prev | (phone << 5));
 }
 
+void x6100_control_moni_set(uint16_t level)
+{
+    x6100_control_cmd(x6100_monilevel, level);
+}
+
 /* Operation */
 
 void x6100_control_ptt_set(bool on) {
