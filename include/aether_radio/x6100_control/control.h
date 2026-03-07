@@ -12,10 +12,6 @@
 #include <stdint.h>
 #include "aether_radio/x6100_control/low/control.h"
 
-typedef enum {
-    X6100_VFO_A = 0,
-    X6100_VFO_B
-} x6100_vfo_t;
 
 /* VFO Settings */
 
@@ -50,6 +46,9 @@ AETHER_X6100CTRL_API void x6100_control_rxvol_set(uint8_t vol);     /* Speaker v
 AETHER_X6100CTRL_API void x6100_control_record_set(bool on);        /* Toggle audio stream mic/speaker or RX/TX audio */
 AETHER_X6100CTRL_API void x6100_control_spmode_set(bool phone);     /* Toggle Speaker/Phone audio out */
 AETHER_X6100CTRL_API void x6100_control_moni_set(uint16_t level);   /* Toggle Speaker/Phone audio out */
+
+AETHER_X6100CTRL_API void x6100_control_tx_filter_low_set(uint16_t freq);   /* Set TX filter low frequency */
+AETHER_X6100CTRL_API void x6100_control_tx_filter_high_set(uint16_t freq);   /* Set TX filter low frequency */
 
 /* Operation */
 

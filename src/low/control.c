@@ -327,8 +327,10 @@ bool x6100_control_set_band(uint32_t freq)
     if (band != cur_band)
     {
         cur_band = band;
+        x6100_vi_vm_t val = {x6100_control_get(x6100_vi_vm)};
+        val.v.band_id = band;
+        x6100_control_cmd(x6100_vi_vm, val.i);
 
-        x6100_control_cmd(x6100_vi_vm, cur_band << 8);
         return true;
     }
     return false;

@@ -11,8 +11,6 @@
 #include <signal.h>
 #include "aether_radio/x6100_control/control.h"
 
-static x6100_vfo_t fg_vfo;
-
 /* VFO Settings */
 
 
@@ -27,14 +25,7 @@ void x6100_control_vfo_mode_set(x6100_vfo_t vfo, x6100_mode_t mode)
 
 void x6100_control_vfo_freq_set(x6100_vfo_t vfo, uint32_t freq)
 {
-    if (vfo == fg_vfo)
-    {
-        if (x6100_control_set_band(freq)) {
-            // Seems, BASE switches to VFO-A, when band was changed.
-            // Force switch to active VFO.
-            x6100_control_vfo_set(fg_vfo);
-        }
-    }
+    x6100_control_set_band(freq);
 
     if (vfo == X6100_VFO_A)
     {
@@ -92,6 +83,20 @@ void x6100_control_spmode_set(bool phone)
 void x6100_control_moni_set(uint16_t level)
 {
     x6100_control_cmd(x6100_monilevel, level);
+}
+
+void x6100_control_tx_filter_low_set(uint16_t freq)
+{
+    x6100_reg_tx_filter_t val = {x6100_control_get(x6100_tx_filter)};
+    val.v.low = freq;
+    x6100_control_cmd(x6100_tx_filter, val.i);
+}
+
+void x6100_control_tx_filter_high_set(uint16_t freq)
+{
+    x6100_reg_tx_filter_t val = {x6100_control_get(x6100_tx_filter)};
+    val.v.high = freq;
+    x6100_control_cmd(x6100_tx_filter, val.i);
 }
 
 /* Operation */
@@ -245,13 +250,13 @@ void x6100_control_dac_gain_set(float gain_db) {
 }
 
 void x6100_control_bf16_flow_set(bool on) {
-    x6100_reg_flow_fm_emp_flags_t reg = {x6100_control_get(x6100_flow_fm_emp)};
+    x6100_reg_flow_fmt_fm_emp_t reg = {x6100_control_get(x6100_flow_fm_emp)};
     reg.v.flow_fp16 = on;
     x6100_control_cmd(x6100_flow_fm_emp, reg.i);
 }
 
 void x6100_control_fm_emp(bool on) {
-    x6100_reg_flow_fm_emp_flags_t reg = {x6100_control_get(x6100_flow_fm_emp)};
+    x6100_reg_flow_fmt_fm_emp_t reg = {x6100_control_get(x6100_flow_fm_emp)};
     reg.v.fm_emp = on;
     x6100_control_cmd(x6100_flow_fm_emp, reg.i);
 }
@@ -390,11 +395,9 @@ void x6100_control_mic_set(x6100_mic_sel_t mic) {
 }
 
 void x6100_control_vfo_set(x6100_vfo_t vfo) {
-    fg_vfo = vfo;
-
-    uint32_t prev = x6100_control_get(x6100_vi_vm) & (~(0xFF));
-
-    x6100_control_cmd(x6100_vi_vm, prev | vfo);
+    x6100_vi_vm_t val = {x6100_control_get(x6100_vi_vm)};
+    val.v.vfo = vfo;
+    x6100_control_cmd(x6100_vi_vm, val.i);
 }
 
 /* DSP */
@@ -456,19 +459,19 @@ void x6100_control_nr_level_set(uint8_t level) {
 /* AGC */
 
 void x6100_control_agc_hang_set(bool on) {
-    x6100_agcknee_agcslope_agchang_t prev = {x6100_control_get(x6100_agcknee_agcslope_agchang)};
-    prev.v.on = on;
+    x6100_reg_agcknee_agcslope_agchang_t prev = {x6100_control_get(x6100_agcknee_agcslope_agchang)};
+    prev.v.hang = on;
     x6100_control_cmd(x6100_agcknee_agcslope_agchang, prev.i);
 }
 
 void x6100_control_agc_knee_set(int8_t db) {
-    x6100_agcknee_agcslope_agchang_t prev = {x6100_control_get(x6100_agcknee_agcslope_agchang)};
+    x6100_reg_agcknee_agcslope_agchang_t prev = {x6100_control_get(x6100_agcknee_agcslope_agchang)};
     prev.v.knee = db;
     x6100_control_cmd(x6100_agcknee_agcslope_agchang, prev.i);
 }
 
 void x6100_control_agc_slope_set(uint8_t db) {
-    x6100_agcknee_agcslope_agchang_t prev = {x6100_control_get(x6100_agcknee_agcslope_agchang)};
+    x6100_reg_agcknee_agcslope_agchang_t prev = {x6100_control_get(x6100_agcknee_agcslope_agchang)};
     prev.v.slope = db;
     x6100_control_cmd(x6100_agcknee_agcslope_agchang, prev.i);
 }

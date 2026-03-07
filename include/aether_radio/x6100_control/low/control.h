@@ -14,6 +14,13 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#define I2C_REG_T(fields) typedef union {uint32_t i; struct fields v;}
+
+typedef enum {
+    X6100_VFO_A = 0,
+    X6100_VFO_B
+} x6100_vfo_t;
+
 typedef enum
 {
     x6100_vfoa_ham_band = 0,
@@ -57,6 +64,8 @@ typedef enum
     x6100_ks_km_kimb_cwtone_cwvol_cwtrain = 33,
     x6100_qsktime_kr,
     x6100_if_shift,  // on/off and shift
+
+    x6100_tx_filter = 38,
 
     x6100_biasdrive_biasfinal = 41,
     x6100_rit,
@@ -158,30 +167,32 @@ typedef struct {
     uint8_t rev;
 } x6100_base_ver_t;
 
-typedef union {
-    uint32_t i;
-    struct {
-        uint8_t flow_fp16: 1;
-        uint8_t fm_emp: 1;
-    } v;
-} x6100_reg_flow_fm_emp_flags_t;
 
-typedef union {
-    uint32_t i;
-    struct {
-        uint16_t adc_dac_gain_offset;  // bf16
-        uint16_t dac_gain_offset;  // bf16
-    } v;
-} x6100_reg_dac_adc_offsets_t;
+I2C_REG_T({
+    uint16_t low;
+    uint16_t high;
+}) x6100_reg_tx_filter_t;
 
-typedef union {
-    uint32_t i;
-    struct {
-        int8_t knee;
-        uint8_t slope: 4;
-        bool on: 1;
-    } v;
-} x6100_agcknee_agcslope_agchang_t;
+I2C_REG_T({
+    uint8_t flow_fp16: 1;
+    uint8_t fm_emp: 1;
+}) x6100_reg_flow_fmt_fm_emp_t;
+
+I2C_REG_T({
+    uint16_t adc_dac_gain_offset;  // bf16
+    uint16_t dac_gain_offset;  // bf16
+}) x6100_reg_dac_adc_offsets_t;
+
+I2C_REG_T({
+    int8_t knee;
+    uint8_t slope: 4;
+    bool hang: 1;
+}) x6100_reg_agcknee_agcslope_agchang_t;
+
+I2C_REG_T({
+    x6100_vfo_t vfo: 1;
+    uint8_t band_id;
+}) x6100_vi_vm_t;
 
 /* Functions */
 
