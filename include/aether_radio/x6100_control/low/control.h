@@ -194,6 +194,13 @@ I2C_REG_T({
     uint8_t band_id;
 }) x6100_vi_vm_t;
 
+I2C_REG_T({
+    uint8_t gain : 7;
+    uint8_t ag : 7;
+    uint16_t delay : 14;
+    bool on : 1;
+}) x6100_reg_vox_t;
+
 /* Functions */
 
 AETHER_X6100CTRL_API bool x6100_control_init();

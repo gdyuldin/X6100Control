@@ -501,27 +501,27 @@ void x6100_control_agc_time_fast_set(uint16_t ms) {
 /* VOX */
 
 void x6100_control_vox_set(bool on) {
-    uint32_t prev = x6100_control_get(x6100_voxg_voxag_voxdly_voxe) & (~(1 << 26));
-
-    x6100_control_cmd(x6100_voxg_voxag_voxdly_voxe, prev | (on << 26));
+    x6100_reg_vox_t prev = {x6100_control_get(x6100_voxg_voxag_voxdly_voxe)};
+    prev.v.on = on;
+    x6100_control_cmd(x6100_voxg_voxag_voxdly_voxe, prev.i);
 }
 
 void x6100_control_vox_ag_set(uint8_t level) {
-    uint32_t prev = x6100_control_get(x6100_voxg_voxag_voxdly_voxe) & (~(0x7F << 7));
-
-    x6100_control_cmd(x6100_voxg_voxag_voxdly_voxe, prev | ((level & 0x7F) << 7));
+    x6100_reg_vox_t prev = {x6100_control_get(x6100_voxg_voxag_voxdly_voxe)};
+    prev.v.ag = level;
+    x6100_control_cmd(x6100_voxg_voxag_voxdly_voxe, prev.i);
 }
 
 void x6100_control_vox_delay_set(uint16_t ms) {
-    uint32_t prev = x6100_control_get(x6100_voxg_voxag_voxdly_voxe) & (~(0xFFF << 14));
-
-    x6100_control_cmd(x6100_voxg_voxag_voxdly_voxe, prev | ((ms & 0xFFF) << 14));
+    x6100_reg_vox_t prev = {x6100_control_get(x6100_voxg_voxag_voxdly_voxe)};
+    prev.v.delay = ms;
+    x6100_control_cmd(x6100_voxg_voxag_voxdly_voxe, prev.i);
 }
 
 void x6100_control_vox_gain_set(uint8_t level) {
-    uint32_t prev = x6100_control_get(x6100_voxg_voxag_voxdly_voxe) & (~0x7F);
-
-    x6100_control_cmd(x6100_voxg_voxag_voxdly_voxe, prev | (level & 0x7F));
+    x6100_reg_vox_t prev = {x6100_control_get(x6100_voxg_voxag_voxdly_voxe)};
+    prev.v.gain = level;
+    x6100_control_cmd(x6100_voxg_voxag_voxdly_voxe, prev.i);
 }
 
 /* COMP
