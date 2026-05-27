@@ -50,6 +50,18 @@ typedef struct
     uint32_t : 27;
 } x6100_flow_flags_t;
 
+typedef struct __packed {
+    uint32_t lo_freq;
+    uint8_t flow_fmt;
+    uint8_t flow_seq_n: 4;
+    uint8_t flow_seq_total: 4;
+    uint8_t vary_freq: 1;
+    uint8_t fft_dec: 3;
+    uint16_t audio_in_lvl_db: 7;  // audio in dB in range 0 ... 127 with +127 dB offset
+    uint32_t _pad1: 5;
+    uint32_t _pad2;
+} flow_info_t;
+
 typedef struct __attribute__((__packed__))
 {
     uint32_t magic;
@@ -65,7 +77,7 @@ typedef struct __attribute__((__packed__))
     uint8_t batcap;
     uint8_t reserved_2;
     uint32_t atu_params;
-    uint32_t reserved_3[3];
+    flow_info_t flow_info;
     uint32_t hkey;
 
     uint32_t crc;
