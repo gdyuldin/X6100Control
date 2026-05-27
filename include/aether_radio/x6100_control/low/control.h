@@ -201,6 +201,14 @@ I2C_REG_T({
     bool on : 1;
 }) x6100_reg_vox_t;
 
+I2C_REG_T({
+    uint8_t nr_level;
+    uint8_t nb_width;
+    uint8_t nb_level;
+    uint8_t nre : 1;
+    uint8_t nbe : 1;
+}) x6100_reg_nrthr_nbw_nbthr_nre_nbe_t;
+
 /* Functions */
 
 AETHER_X6100CTRL_API bool x6100_control_init();

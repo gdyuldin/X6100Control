@@ -427,33 +427,33 @@ void x6100_control_dnf_update_set(bool on) {
 }
 
 void x6100_control_nb_set(bool on) {
-    uint32_t prev = x6100_control_get(x6100_nrthr_nbw_nbthr_nre_nbe) & (~(1 << 25));
-
-    x6100_control_cmd(x6100_nrthr_nbw_nbthr_nre_nbe, prev | (on << 25));
+    x6100_reg_nrthr_nbw_nbthr_nre_nbe_t prev = {x6100_control_get(x6100_nrthr_nbw_nbthr_nre_nbe)};
+    prev.v.nbe = on;
+    x6100_control_cmd(x6100_nrthr_nbw_nbthr_nre_nbe, prev.i);
 }
 
 void x6100_control_nb_level_set(uint8_t level) {
-    uint32_t prev = x6100_control_get(x6100_nrthr_nbw_nbthr_nre_nbe) & (~(0xFF << 16));
-
-    x6100_control_cmd(x6100_nrthr_nbw_nbthr_nre_nbe, prev | (level << 16));
+    x6100_reg_nrthr_nbw_nbthr_nre_nbe_t prev = {x6100_control_get(x6100_nrthr_nbw_nbthr_nre_nbe)};
+    prev.v.nb_level = level;
+    x6100_control_cmd(x6100_nrthr_nbw_nbthr_nre_nbe, prev.i);
 }
 
 void x6100_control_nb_width_set(uint8_t hz) {
-    uint32_t prev = x6100_control_get(x6100_nrthr_nbw_nbthr_nre_nbe) & (~(0xFF << 8));
-
-    x6100_control_cmd(x6100_nrthr_nbw_nbthr_nre_nbe, prev | (hz << 8));
+    x6100_reg_nrthr_nbw_nbthr_nre_nbe_t prev = {x6100_control_get(x6100_nrthr_nbw_nbthr_nre_nbe)};
+    prev.v.nb_width = hz;
+    x6100_control_cmd(x6100_nrthr_nbw_nbthr_nre_nbe, prev.i);
 }
 
 void x6100_control_nr_set(bool on) {
-    uint32_t prev = x6100_control_get(x6100_nrthr_nbw_nbthr_nre_nbe) & (~(1 << 24));
-
-    x6100_control_cmd(x6100_nrthr_nbw_nbthr_nre_nbe, prev | (on << 24));
+    x6100_reg_nrthr_nbw_nbthr_nre_nbe_t prev = {x6100_control_get(x6100_nrthr_nbw_nbthr_nre_nbe)};
+    prev.v.nre = on;
+    x6100_control_cmd(x6100_nrthr_nbw_nbthr_nre_nbe, prev.i);
 }
 
 void x6100_control_nr_level_set(uint8_t level) {
-    uint32_t prev = x6100_control_get(x6100_nrthr_nbw_nbthr_nre_nbe) & (~0xFF);
-
-    x6100_control_cmd(x6100_nrthr_nbw_nbthr_nre_nbe, prev | level);
+    x6100_reg_nrthr_nbw_nbthr_nre_nbe_t prev = {x6100_control_get(x6100_nrthr_nbw_nbthr_nre_nbe)};
+    prev.v.nr_level = level;
+    x6100_control_cmd(x6100_nrthr_nbw_nbthr_nre_nbe, prev.i);
 }
 
 /* AGC */
