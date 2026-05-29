@@ -358,7 +358,22 @@ void x6100_control_key_ratio_set(float ratio) {
     x6100_control_cmd(x6100_qsktime_kr, prev | ((r & 0xFFFF) << 16));
 }
 
-void x6100_control_linein_set(uint8_t gain) {
+void x6100_control_cw_peak_set(bool on)
+{
+    x6100_reg_cw_peak_t prev = {x6100_control_get(x6100_cw_peak)};
+    prev.v.on = on;
+    x6100_control_cmd(x6100_cw_peak, prev.i);
+}
+
+void x6100_control_cw_peak_q_set(uint8_t q)
+{
+    x6100_reg_cw_peak_t prev = {x6100_control_get(x6100_cw_peak)};
+    prev.v.q = q;
+    x6100_control_cmd(x6100_cw_peak, prev.i);
+}
+
+void x6100_control_linein_set(uint8_t gain)
+{
     uint32_t prev = x6100_control_get(x6100_ling_loutg_imicg_hmicg) & (~(0xFF));
 
     x6100_control_cmd(x6100_ling_loutg_imicg_hmicg, prev | gain);

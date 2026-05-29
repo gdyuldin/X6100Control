@@ -76,6 +76,8 @@ AETHER_X6100CTRL_API void x6100_control_key_vol_set(uint16_t vol);
 AETHER_X6100CTRL_API void x6100_control_key_train_set(bool train);
 AETHER_X6100CTRL_API void x6100_control_qsk_time_set(uint16_t time);
 AETHER_X6100CTRL_API void x6100_control_key_ratio_set(float ratio);
+AETHER_X6100CTRL_API void x6100_control_cw_peak_set(bool on);
+AETHER_X6100CTRL_API void x6100_control_cw_peak_q_set(uint8_t q);
 
 /* Line's settings */
 
