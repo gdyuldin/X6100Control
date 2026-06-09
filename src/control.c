@@ -99,6 +99,22 @@ void x6100_control_tx_filter_high_set(uint16_t freq)
     x6100_control_cmd(x6100_tx_filter, val.i);
 }
 
+void x6100_control_cessb_set(bool on)
+{
+    x6100_reg_cw_peak_cessb_t prev = {x6100_control_get(x6100_cw_peak_cessb)};
+    prev.v.cessb_on = on;
+    x6100_control_cmd(x6100_cw_peak_cessb, prev.i);
+}
+
+void x6100_control_cessb_power_up_set(float val)
+{
+    val = val < 0.0f ? 0.0f : val;
+    val = val > 6.0f ? 6.0f : val;
+    x6100_reg_cw_peak_cessb_t prev = {x6100_control_get(x6100_cw_peak_cessb)};
+    prev.v.cessb_power_up = val * 10;
+    x6100_control_cmd(x6100_cw_peak_cessb, prev.i);
+}
+
 /* Operation */
 
 void x6100_control_ptt_set(bool on) {
@@ -360,16 +376,16 @@ void x6100_control_key_ratio_set(float ratio) {
 
 void x6100_control_cw_peak_set(bool on)
 {
-    x6100_reg_cw_peak_t prev = {x6100_control_get(x6100_cw_peak)};
-    prev.v.on = on;
-    x6100_control_cmd(x6100_cw_peak, prev.i);
+    x6100_reg_cw_peak_cessb_t prev = {x6100_control_get(x6100_cw_peak_cessb)};
+    prev.v.cw_peak_on = on;
+    x6100_control_cmd(x6100_cw_peak_cessb, prev.i);
 }
 
 void x6100_control_cw_peak_q_set(uint8_t q)
 {
-    x6100_reg_cw_peak_t prev = {x6100_control_get(x6100_cw_peak)};
-    prev.v.q = q;
-    x6100_control_cmd(x6100_cw_peak, prev.i);
+    x6100_reg_cw_peak_cessb_t prev = {x6100_control_get(x6100_cw_peak_cessb)};
+    prev.v.cw_peak_q = q;
+    x6100_control_cmd(x6100_cw_peak_cessb, prev.i);
 }
 
 void x6100_control_linein_set(uint8_t gain)

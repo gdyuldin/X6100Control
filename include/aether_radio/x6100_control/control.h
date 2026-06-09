@@ -49,6 +49,8 @@ AETHER_X6100CTRL_API void x6100_control_moni_set(uint16_t level);   /* Toggle Sp
 
 AETHER_X6100CTRL_API void x6100_control_tx_filter_low_set(uint16_t freq);   /* Set TX filter low frequency */
 AETHER_X6100CTRL_API void x6100_control_tx_filter_high_set(uint16_t freq);   /* Set TX filter low frequency */
+AETHER_X6100CTRL_API void x6100_control_cessb_set(bool on);
+AETHER_X6100CTRL_API void x6100_control_cessb_power_up_set(float val);
 
 /* Operation */
 
