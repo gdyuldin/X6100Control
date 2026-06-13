@@ -243,6 +243,9 @@ uint32_t x6100_control_get(x6100_cmd_enum_t cmd)
 char *x6100_control_get_fw_version_str()
 {
     static char version[0x80] = "\0";
+    if (version[0] != '\0') {
+        return version;
+    }
     if (get_regs(0, version, 0x80))
         return version;
     else
