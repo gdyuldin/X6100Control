@@ -13,10 +13,11 @@
 #include <termios.h>
 #include <pthread.h>
 #include <errno.h>
-
+#include <sys/epoll.h>
 
 
 static int uart_fd;
+static int epoll_fd = -1;
 static pthread_mutex_t fd_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 
@@ -48,14 +49,31 @@ bool x6100_uart_open_fd() {
 
     if (tcsetattr(uart_fd, 0, &attr) < 0)
     {
-        x6100_uart_close_fd(uart_fd);
+        x6100_uart_close_fd();
         return false;
     }
+
+    epoll_fd = epoll_create1(0);
+    if (epoll_fd < 0) {
+        x6100_uart_close_fd();
+        return false;
+    }
+
+    struct epoll_event ev = { .events = EPOLLIN, .data.fd = uart_fd };
+    if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, uart_fd, &ev) < 0) {
+        x6100_uart_close_fd();
+        return false;
+    }
+
     return true;
 }
 
 
 bool x6100_uart_close_fd() {
+    if (epoll_fd >= 0) {
+        close(epoll_fd);
+        epoll_fd = -1;
+    }
     if (uart_fd > 0) {
         close(uart_fd);
         uart_fd = 0;
@@ -78,6 +96,19 @@ void uart_unlock()
 
 ssize_t uart_read(void *__buf, size_t __nbytes)
 {
+    uart_lock();
+    ssize_t res = read(uart_fd, __buf, __nbytes);
+    uart_unlock();
+    return res;
+}
+
+ssize_t uart_read_wait(void *__buf, size_t __nbytes, int timeout_ms)
+{
+    struct epoll_event event;
+    int n = epoll_wait(epoll_fd, &event, 1, timeout_ms);
+    if (n <= 0)
+        return 0;
+
     uart_lock();
     ssize_t res = read(uart_fd, __buf, __nbytes);
     uart_unlock();

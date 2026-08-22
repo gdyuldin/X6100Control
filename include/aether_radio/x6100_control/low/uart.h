@@ -20,6 +20,7 @@ AETHER_X6100CTRL_NO_EXPORT void uart_lock();
 AETHER_X6100CTRL_NO_EXPORT void uart_unlock();
 
 AETHER_X6100CTRL_NO_EXPORT ssize_t uart_read(void *__buf, size_t __nbytes);
+AETHER_X6100CTRL_NO_EXPORT ssize_t uart_read_wait(void *__buf, size_t __nbytes, int timeout_ms);
 AETHER_X6100CTRL_NO_EXPORT void uart_flush();
 
 AETHER_X6100CTRL_NO_EXPORT bool uart_communicate(char *data, size_t data_len, char *answer, size_t answer_len, size_t wait_for_ms);

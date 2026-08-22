@@ -123,7 +123,7 @@ bool x6100_flow_read(x6100_flow_t *pack)
         buf_write -= shift;
     }
 
-    int res = uart_read(buf_write, sizeof(x6100_flow_t));
+    int res = uart_read_wait(buf_write, sizeof(x6100_flow_t), 50);
 
     if (res > 0) {
         buf_write += res;
