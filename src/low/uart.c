@@ -14,6 +14,7 @@
 #include <pthread.h>
 #include <errno.h>
 #include <sys/epoll.h>
+#include <time.h>
 
 
 static int uart_fd;
@@ -104,15 +105,47 @@ ssize_t uart_read(void *__buf, size_t __nbytes)
 
 ssize_t uart_read_wait(void *__buf, size_t __nbytes, int timeout_ms)
 {
-    struct epoll_event event;
-    int n = epoll_wait(epoll_fd, &event, 1, timeout_ms);
-    if (n <= 0)
+    if (__nbytes == 0 || timeout_ms <= 0)
         return 0;
 
-    uart_lock();
-    ssize_t res = read(uart_fd, __buf, __nbytes);
-    uart_unlock();
-    return res;
+    struct timespec start;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    size_t total_read = 0;
+    char *buf = (char *)__buf;
+
+    while (total_read < __nbytes) {
+        // Calculate remaining timeout
+        struct timespec now;
+        clock_gettime(CLOCK_MONOTONIC, &now);
+        long elapsed_ms = (now.tv_sec - start.tv_sec) * 1000 +
+                          (now.tv_nsec - start.tv_nsec) / 1000000;
+        int remaining = timeout_ms - (int)elapsed_ms;
+        if (remaining <= 0)
+            break;                              // total timeout expired
+
+        struct epoll_event event;
+        int n = epoll_wait(epoll_fd, &event, 1, remaining);
+        if (n <= 0)
+            break;                              // timeout or epoll error
+
+        // Data is ready — read what's available
+        uart_lock();
+        ssize_t res = read(uart_fd, buf + total_read, __nbytes - total_read);
+        uart_unlock();
+
+        if (res < 0) {
+            if (errno == EAGAIN || errno == EINTR)
+                continue;                       // spurious wakeup, retry
+            return -1;                          // fatal read error
+        }
+        if (res == 0)
+            break;                              // EOF (device closed)
+
+        total_read += res;
+    }
+
+    return (ssize_t)total_read;
 }
 
 void uart_flush()
