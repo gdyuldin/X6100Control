@@ -68,7 +68,7 @@ bool x6100_gpio_init()
     EXIT_ON_FALSE(gpio_line_open(X6100_PIN_BB_RESET, "X6100_bb_reset", chip1, 0, &line_bb_reset), "Can't open GPIO bb reset line");
     EXIT_ON_FALSE(gpio_line_open(X6100_PIN_USB, "X6100_usb", chip1, 0, &line_usb), "Can't open GPIO usb line");
     EXIT_ON_FALSE(gpio_line_open(X6100_PIN_LIGHT, "X6100_light", chip1, 0, &line_light), "Can't open GPIO light line");
-    EXIT_ON_FALSE(gpio_line_open(5, "X6100_wifi", chip0, 0, &line_wifi), "Can't open GPIO wifi line");
+    EXIT_ON_FALSE(gpio_line_open(5, "X6100_wifi", chip0, 1, &line_wifi), "Can't open GPIO wifi line");
     return true;
 }
 
